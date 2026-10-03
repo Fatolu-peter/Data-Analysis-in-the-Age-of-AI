@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Analysis in the Age of AI — Fatolu Peter</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#070b2a;--navy2:#0e1546;--royal:#2447f5;--elec:#3fa9ff;--lav:#c9c4ff;--white:#fff;--mute:#9aa3d6;--bad:#ff7a8a;--ok:#5ff0b8;
+--h:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;--b:'Instrument Sans','Segoe UI',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--navy);color:var(--white);font-family:var(--b);overflow:hidden}
+#deck{position:fixed;inset:0}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:6vh 8vw 11vh;opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s;overflow-y:auto;background:radial-gradient(900px 500px at 85% 0,#16226e55,transparent),var(--navy)}
+.slide.on{opacity:1;visibility:visible}
+.slide.alt{background:radial-gradient(800px 500px at 10% 100%,#2447f533,transparent),var(--navy2)}
+.slide.light{background:#f3f2ff;color:var(--navy)}
+.slide.light .chip{background:#fff;color:var(--navy);border-color:#d7d4ff}
+.slide.dark0{background:#000}
+h1,h2,h3{font-family:var(--h);line-height:1.05;letter-spacing:-.02em}
+h1{font-size:clamp(2rem,6vw,5.4rem);font-weight:800}
+h2{font-size:clamp(1.7rem,4.2vw,3.6rem);font-weight:800;max-width:20ch}
+h2.wide{max-width:28ch}
+p.sub{font-size:clamp(1rem,1.7vw,1.5rem);color:var(--mute);margin-top:1.2vh;max-width:46ch;line-height:1.4}
+.light p.sub{color:#4a4f86}
+.hl{color:var(--elec)}.light .hl{color:var(--royal)}
+.lesson{margin-top:3vh;font-family:var(--h);font-size:clamp(1.1rem,2vw,1.8rem);font-weight:700;color:var(--lav);max-width:34ch}
+.light .lesson{color:var(--royal)}
+.q{font-family:var(--h);font-weight:700;font-size:clamp(1.3rem,2.6vw,2.3rem);line-height:1.2;max-width:26ch;border-left:4px solid var(--elec);padding-left:2vw;margin-top:3vh}
+.q cite{display:block;font:500 clamp(.8rem,1.1vw,1rem) var(--b);color:var(--mute);margin-top:1vh;font-style:normal}
+.q.big{font-size:clamp(2rem,5vw,4.6rem);border:0;padding:0;max-width:20ch}
+.flow{display:flex;flex-wrap:wrap;gap:1.2vw 2.4vw;margin-top:4vh;align-items:center}
+.chip{font-family:var(--h);font-weight:600;font-size:clamp(.85rem,1.4vw,1.25rem);padding:1.1vh 1.4vw;border-radius:999px;border:1px solid #ffffff30;background:#ffffff0d;position:relative;cursor:default;transition:.2s}
+.flow .chip:not(:last-child)::after{content:'';position:absolute;right:-1.9vw;top:50%;width:1.4vw;height:2px;background:var(--elec)}
+.flow.v{flex-direction:column;align-items:flex-start;gap:2.6vh}
+.flow.v .chip:not(:last-child)::after{right:auto;left:50%;top:calc(100% + 3px);width:2px;height:1.8vh}
+[data-tip]{cursor:pointer}[data-tip]:hover,[data-tip].sel{background:var(--royal);border-color:var(--elec);color:#fff}
+.tipbox{margin-top:3vh;min-height:4.5em;font-size:clamp(1rem,1.6vw,1.4rem);color:var(--lav);max-width:60ch;border-left:3px solid var(--royal);padding-left:1.2vw}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:3vw;margin-top:4vh}
+.card{border-radius:22px;padding:3vh 2vw;background:#ffffff0f;border:1px solid #ffffff1c;backdrop-filter:blur(8px)}
+.card.bad{border-color:#ff7a8a66}.card.good{border-color:#5ff0b866}
+.card h3{font-size:clamp(1rem,1.6vw,1.4rem);margin-bottom:1.5vh}
+.card .chip{display:block;margin:1vh 0;border-radius:12px;text-align:center}
+.bad h3{color:var(--bad)}.good h3{color:var(--ok)}
+.big-n{font-family:var(--h);font-weight:800;font-size:clamp(2.4rem,7vw,6rem);color:var(--elec)}
+.stats{display:flex;gap:4vw;flex-wrap:wrap;margin-top:3vh}.stats small{display:block;color:var(--mute);font-size:clamp(.8rem,1.2vw,1rem)}
+.ask{margin-top:3vh;display:inline-block;padding:1.4vh 1.6vw;border-radius:16px;background:var(--royal);font-family:var(--h);font-weight:600;font-size:clamp(1rem,1.8vw,1.6rem);max-width:36ch}
+.fig{width:100%;max-height:44vh;margin-top:3vh}
+.fig text{font-family:var(--h);font-weight:600;fill:#fff}
+.flowline{stroke-dasharray:6 6;animation:dash 1.2s linear infinite}@keyframes dash{to{stroke-dashoffset:-24}}
+.pyr{display:flex;flex-direction:column;align-items:center;gap:1vh;margin-top:3vh}
+.pyr div{padding:1.4vh 0;text-align:center;border-radius:12px;font-family:var(--h);font-weight:700;font-size:clamp(.9rem,1.5vw,1.3rem)}
+.cyc{display:flex;gap:1.2vw;margin-top:4vh;flex-wrap:wrap}
+.cyc .chip{font-size:clamp(2rem,5vw,4rem);width:clamp(3.6rem,9vw,7rem);height:clamp(3.6rem,9vw,7rem);display:grid;place-items:center;border-radius:50%;padding:0}
+.chk{display:flex;gap:1.4vw;align-items:flex-start;padding:2vh 1.6vw;margin-top:1.4vh;border-radius:16px;background:#ffffff0f;border:1px solid #ffffff1c;cursor:pointer;font-size:clamp(1rem,1.7vw,1.5rem);max-width:60ch}
+.chk i{flex:none;width:1.6em;height:1.6em;border-radius:50%;border:2px solid var(--elec);display:grid;place-items:center;font-style:normal;color:transparent}
+.chk.done{opacity:.6}.chk.done i{background:var(--ok);border-color:var(--ok);color:var(--navy)}
+.f{opacity:0;transform:translateY(10px);transition:.7s}.f.show{opacity:1;transform:none}
+.stage{text-align:center;align-items:center}.stage h2{max-width:24ch}
+.tl{display:flex;gap:1vw;margin-top:3vh;flex-wrap:wrap}.tl .chip{flex:1;text-align:center;border-radius:14px;min-width:90px}
+.pf{width:clamp(140px,18vw,220px);height:auto;max-height:35vh;object-fit:contain;border-radius:18px;box-shadow:0 0 0 3px var(--royal),0 20px 60px #2447f566;margin-bottom:2vh}
+.pf2{position:absolute;right:8vw;top:9vh;width:clamp(110px,15vw,210px);border-radius:18px;box-shadow:0 0 0 2px var(--elec)}@media(max-width:700px){.pf2{display:none}}
+.ct{display:flex;flex-wrap:wrap;justify-content:center;gap:1.2vh 1vw;margin-top:2vh;max-width:90vw}.ct a{display:inline-flex;align-items:center;gap:.6em;color:#fff;text-decoration:none;font:500 clamp(.8rem,1.15vw,1.05rem) var(--b);padding:.7em 1.1em;border-radius:999px;background:#ffffff0f;border:1px solid #ffffff30;transition:.2s}.ct a:hover,.ct a:focus-visible{background:var(--royal);border-color:var(--elec);outline:none}.ct svg{width:1.3em;height:1.3em;color:var(--elec);flex:none}.ct a:hover svg{color:#fff}
+/* chrome */
+#bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--royal),var(--elec),var(--lav));width:0;z-index:20;transition:width .4s}
+#nav{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;gap:1vw;padding:1.4vh 2vw;z-index:20;background:linear-gradient(transparent,#070b2acc)}
+#nav button{font:600 .9rem var(--b);color:#fff;background:#ffffff14;border:1px solid #ffffff30;border-radius:999px;padding:.6em 1.1em;cursor:pointer}
+#nav button:hover,#nav button:focus-visible{background:var(--royal);outline:2px solid var(--lav)}
+#ctr{font:600 .95rem var(--h);color:var(--mute);margin:0 auto 0 .5vw;letter-spacing:.08em}
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:46vh;overflow:auto;background:#0b1038f2;border-top:2px solid var(--royal);padding:2.2vh 8vw 9vh;z-index:15;transform:translateY(100%);transition:.35s;font-size:clamp(.95rem,1.35vw,1.2rem);line-height:1.6;color:#e4e6ff}
+#notes.open{transform:none}#notes b{color:var(--elec)}
+@media(max-width:700px){.cols{grid-template-columns:1fr}.slide{padding:5vh 6vw 14vh}#nav .opt{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body>
+<div id="bar"></div><main id="deck"></main><aside id="notes" aria-live="polite"></aside>
+<nav id="nav"><button id="pv">← Previous</button><button id="nx">Next →</button><span id="ctr"></span>
+<button id="nt" class="opt">Notes (N)</button><button id="fs" class="opt">Fullscreen (F)</button></nav>
+<script>
+const Q=t=>`<blockquote class="q">“${t}”<cite>— Fatolu Peter</cite></blockquote>`;
+const flow=(a,c='')=>`<div class="flow ${c}">${a.map(x=>`<span class="chip">${x}</span>`).join('')}</div>`;
+const tipflow=a=>`<div class="flow">${a.map(x=>`<span class="chip" data-tip="${x[1]}">${x[0]}</span>`).join('')}</div><div class="tipbox">Click a step.</div>`;
+
+const S=[
+// 1 HOOK
+['',`<h1 class="f show">AI CAN ANALYZE DATA.<br><span class="hl">BUT CAN IT UNDERSTAND THE PROBLEM?</span></h1>
+<svg class="fig f show" viewBox="0 0 800 200" role="img" aria-label="Human with a messy problem on the left, AI processing rows on the right, a question mark between">
+<g stroke="#c9c4ff" fill="none" stroke-width="2"><circle cx="90" cy="60" r="22"/><path d="M90 82v60M50 150q40-60 80 0"/><path class="flowline" d="M140 40c40 30-30 50 20 80s30-60 50-20-40 40-10 60" stroke="#ff7a8a"/></g>
+<g fill="#3fa9ff">${[0,1,2,3,4,5].map(r=>`<rect x="590" y="${30+r*26}" width="${150-r*12}" height="12" rx="6" opacity="${1-r*.12}"/>`).join('')}</g>
+<text x="400" y="130" font-size="90" text-anchor="middle" fill="#fff" opacity=".9">?</text></svg>
+<p class="sub f" style="margin-top:2vh">Fatolu Peter · Data Analysis in the Age of AI</p>
+<h2 class="f wide" style="margin-top:3vh">Because the hardest part of data analysis has never been opening Power BI.</h2>
+<h2 class="f hl wide">It has always been knowing what question to ask.</h2>`,
+`<b>[LET THE SLIDE SIT]</b> Don't speak for five seconds. Let them read it.<br><br>Good evening, People Like Us. [PAUSE] I want to start with a confession. The first dashboard I was proud of? Nobody used it. It was clean. It was fast. It was wrong for the question the manager actually had.<br><br><b>[CLICK]</b> So tonight is not about a new tool. <b>[CLICK]</b> Because the hardest part of data analysis has never been opening Power BI. [PAUSE] <b>[CLICK]</b> It has always been knowing what question to ask.`],
+// 2
+['alt',`<h2>Before the dashboard, there was a problem.</h2>
+<p class="sub">The business doesn't want Excel, SQL, Power BI or Python. It wants an answer.</p>
+${flow(['Business owner','Question','Data','Analysis','Insight','Decision','Impact'])}
+<p class="sub" style="font-style:italic">“Why are our sales falling?” “Which product is actually profitable?” “Where are we losing money?”</p>
+${Q('A dashboard is not the destination. A decision is.')}`,
+`Picture a retail owner in Ikeja. She hands you a spreadsheet. She doesn't say "build me a Power BI report." She says: <i>"Why am I selling more and still feeling poorer?"</i><br><br>Walk the line slowly. Tools live in the middle. Her business lives at both ends.<br><br><b>[ASK AUDIENCE]</b> Raise your hand if you've ever built a dashboard nobody used. [PAUSE] Yes. Me too. That's why: a dashboard is not the destination. A decision is.`],
+// 3
+['',`<h2>Then AI arrived.</h2><p class="sub">Technology changed faster than the problem did.</p>
+<div class="tl">${['Excel','SQL','BI','Cloud','Generative AI','AI agents'].map((x,i)=>`<span class="chip" style="${i>3?'background:var(--royal)':''}">${x}</span>`).join('')}</div>
+<div class="cols" style="grid-template-columns:repeat(3,1fr)"><div class="card"><h3>Past</h3>Analyst does many repetitive tasks by hand.</div><div class="card"><h3>Present</h3>Analyst + AI collaborate.</div><div class="card"><h3 class="hl">Future</h3>Analyst orchestrates data, AI, tools and decisions.</div></div>`,
+`Look how fast this line moved. Every box here changed how we <i>do</i> the work. [PAUSE] None of them changed <i>why</i> we do it.<br><br>Past: we did everything by hand. Present: we sit with a partner that drafts, explains and suggests. Future: we conduct. Like a band leader — you don't play every instrument, but you must know what song you're playing.`],
+// 4
+['alt',`<h2 class="wide">AI is not your replacement. It is your multiplier — if you know how to use it.</h2>
+<p class="sub">Click through a real question: “Why did revenue decline?”</p>
+${tipflow([['Question','AI can help sharpen a vague question. You decide which one matters.'],['Inspect','Ask AI to profile columns, nulls, odd values. You judge what is odd for this business.'],['SQL','AI drafts the query in seconds. You check the joins and the grain.'],['Analyse','AI suggests cuts: region, product, month. You choose the ones that can explain a cause.'],['Validate','Reconcile with finance totals. This step stays yours.'],['Visualise','AI proposes chart ideas. You pick what makes the decision obvious.'],['Interpret','AI summarises. You explain what it means for THIS business.'],['Decide','Only the humans who carry the consequences.']])}
+${Q('AI can accelerate your work, but it cannot define your purpose.')}`,
+`The list is long: cleaning, SQL, Python, DAX, exploration, documentation, patterns, chart ideas, storytelling, automation, research, scenarios. I won't read it. [PAUSE] Instead, watch one question travel.<br><br><b>[CLICK each step]</b> At every step AI helps — and at every step something is left for you.<br><br>Acceleration in the wrong direction is still the wrong direction.<br><br><b>[ASK AUDIENCE]</b> Have you ever asked AI something and trusted the answer too quickly?`],
+// 5
+['',`<h2 class="wide">AI can give you an answer before you know whether it is the right question.</h2>
+<div class="cols"><div class="card bad"><h3>Bad question</h3>${['Vague question','AI','Beautiful answer','Wrong decision'].map(x=>`<span class="chip">${x}</span>`).join('')}</div>
+<div class="card good"><h3>Good question</h3>${['Clear question','Data','AI + human analysis','Validation','Insight','Better decision'].map(x=>`<span class="chip">${x}</span>`).join('')}</div></div>
+<p class="lesson">Speed is valuable. Direction is more valuable.</p>`,
+`This is the heart of tonight. [PAUSE]<br><br>Say you type: <i>"Analyse my sales."</i> AI gives you a gorgeous summary in four seconds. Charts. Insights. Confidence. But what was the business asking? Margin? Churn? Stock? You never said.<br><br><b>[ASK AUDIENCE]</b> What happens when the data is wrong but the dashboard looks beautiful? [PAUSE] People make confident mistakes. Beautifully.<br><br>Speed is valuable. Direction is more valuable.`],
+// 6
+['alt',`<h2>What AI still needs from you.</h2>
+<div class="cols"><div class="card"><h3 class="hl">You — the driver</h3>Context · Curiosity · Judgment · Domain knowledge · Critical thinking · Communication · Ethics · Business sense · Creativity · Empathy</div>
+<div class="card"><h3>AI — the engine</h3>Automation · Generation · Pattern detection · Summarisation · Assistance · Prediction</div></div>
+${flow(['Ask','Understand','Investigate','Validate','Interpret','Decide','Act'])}`,
+`A powerful engine without a good driver doesn't guarantee a good destination. Anyone who has taken a Lagos danfo at 6pm knows this. [PAUSE] The engine is the same. The driver decides whether you arrive.<br><br>Read the left column slowly. None of those can be downloaded. Then the seven steps — that is how a good analyst works <i>with</i> AI. Notice: AI helps in most of them. It <i>owns</i> none of them.`],
+// 7
+['light',`<h2 class="wide">Let's solve a real problem.</h2>
+<div class="stats"><div><span class="big-n" data-count="500000">0</span><small>transactions</small></div><div><span class="big-n" data-count="12">0</span><small>months</small></div><div><span class="big-n" data-count="9">0</span><small>branches (e.g. Lagos, Abuja, PH…)</small></div></div>
+<p class="sub">A retail company. Revenue is growing, but profit is falling.</p>
+<span class="ask">What would you investigate first?</span>
+${tipflow([['Revenue','Is growth real, or just more discounted sales?'],['Units','More units can still mean less money.'],['Price','Average selling price may be sliding.'],['Discounts','Who approved them? Which branches?'],['Cost','Is landed cost complete — freight, FX, duties?'],['Returns','Are returns recorded properly or hiding in another table?'],['Mix','Are we selling more of the low-margin products?'],['Branch','One branch may be dragging the rest.'],['Customers','Which segments cost more to serve?']])}
+<p class="lesson">The hardest part wasn't writing the query. It was knowing what to investigate.</p>`,
+`<b>[ASK AUDIENCE]</b> Type in the chat: what would you check first? [PAUSE 20 seconds] Don't reveal anything yet. Let them guess.<br><br><b>[STORY]</b> Imagine a Nigerian retail chain — nine branches, half a million transactions. The MD says revenue is up. Accountant says cash is tight.<br><br>Click through each chip. AI can write every query here. But it does not know what <i>your company</i> calls profit. It doesn't know if cost is complete, whether returns are logged, or whether the data is even reliable. Only people inside the business know. [PAUSE]<br><br>The hardest part wasn't the query. It was knowing what to investigate. ${Q('The most valuable data is sometimes the data you don\'t have.')}`],
+// 8
+['alt',`<h2 class="wide">Before you build another dashboard, fix your data model.</h2>
+<svg class="fig" viewBox="0 0 700 280" role="img" aria-label="Star schema with FactSales at center and five dimension tables">
+${[['DimDate',90,40],['DimCustomer',350,25],['DimProduct',610,40],['DimStore',140,235],['DimEmployee',560,235]].map(d=>`<line class="flowline" x1="350" y1="140" x2="${d[1]}" y2="${d[2]}" stroke="#3fa9ff" stroke-width="2"/>`).join('')}
+${[['DimDate',90,40],['DimCustomer',350,25],['DimProduct',610,40],['DimStore',140,235],['DimEmployee',560,235]].map(d=>`<rect x="${d[1]-62}" y="${d[2]-18}" width="124" height="36" rx="10" fill="#1b2780" stroke="#c9c4ff"/><text x="${d[1]}" y="${d[2]+5}" text-anchor="middle" font-size="14">${d[0]}</text>`).join('')}
+<rect x="285" y="112" width="130" height="56" rx="14" fill="#2447f5"/><text x="350" y="146" text-anchor="middle" font-size="18">FactSales</text></svg>
+<div class="cols" style="margin-top:1vh"><div class="card"><h3>Fact = events</h3>Every sale, every transaction.</div><div class="card"><h3>Dimensions = context</h3>Who, what, where, when.</div></div>
+<p class="lesson">If your foundation is weak, a beautiful dashboard only hides the problem.</p>`,
+`The fact table records what happened. Dimensions tell you the story around it: who bought, what, where, when, who sold.<br><br>Keep four words in your head: <b>grain</b> — what does one row mean? <b>Keys.</b> <b>Relationships.</b> <b>Cardinality.</b> Get these wrong and no DAX will save you.<br><br>Messy model: tangled links, duplicates, slow calculations, confusing results. Star schema: clear links, faster, simpler DAX. [PAUSE] If your foundation is weak, a beautiful dashboard only hides the problem.`],
+// 9
+['',`<h2 class="wide">AI cannot magically fix data you don't understand.</h2>
+${flow(['Garbage data','AI','Faster garbage'])}
+${flow(['Quality data','Clear context','Human validation','AI','Useful insight'])}
+<div class="tl" style="margin-top:4vh">${['Missing values','Duplicates','Wrong categories','Wrong dates','Inconsistent names','Bad relationships','Outliers','Data leakage','Bias'].map(x=>`<span class="chip">${x}</span>`).join('')}</div>`,
+`AI is a very fast intern. Give a fast intern bad data and you'll get wrong answers quicker.<br><br>"Lagos", "lagos", "LAGOS " with a trailing space — three branches in your report. A date typed month-first where it should be day-first. A customer counted twice. [PAUSE]<br><br>Use AI to <i>find</i> these problems. Never to decide they're fine. ${Q('Data becomes valuable when it changes a decision.')}`],
+// 10
+['alt',`<h2>Stop training to be a human calculator.</h2>
+<div class="pyr">${[['Decision intelligence','#c9c4ff','#070b2a','34%'],['Business understanding','#8f9bff','#070b2a','48%'],['Analytical thinking','#3fa9ff','#070b2a','62%'],['Technical skills','#2447f5','#fff','76%'],['Tools','#1b2780','#fff','90%']].map(x=>`<div style="background:${x[1]};color:${x[2]};width:${x[3]}">${x[0]}</div>`).join('')}</div>
+<p class="lesson">The higher you move, the harder you are to replace with a tool.</p>`,
+`Old analyst: collect, clean, calculate, report. Modern analyst: question, investigate, model, communicate, recommend. AI-enabled analyst: problem solver, data thinker, AI collaborator, business translator.<br><br>Be careful — I'm not saying any role is safe forever. Nobody can promise that. I'm giving you a direction for building skills. Start at the base, but don't live there.`],
+// 11
+['',`<h2>The Peter Fatolu Data-to-Decision Framework</h2>
+<div class="cyc">${[['P','Problem','Define the real business problem.'],['E','Explore','Explore the data you have.'],['T','Think','Think critically about patterns and causes.'],['E','Evaluate','Check findings with AI + human validation.'],['R','Recommend','Recommend an action.']].map(x=>`<span class="chip" data-tip="${x[1]} — ${x[2]}">${x[0]}</span>`).join('')}</div>
+<div class="tipbox">Click a letter.</div>
+${Q('Don\'t start with the dashboard. Start with the decision.')}`,
+`<b>[CLICK each letter]</b> This is what I want you to leave with. P-E-T-E-R. Yes, it's my name — easy to remember. [PAUSE]<br><br>Problem first. Explore second. Think third. Evaluate with AI <i>and</i> human check. Recommend last.<br><br>Notice: the dashboard isn't even a letter. Don't start with the dashboard. Start with the decision.`],
+// 12
+['alt',`<img class="pf" src="./Pet.png" alt="Peter's Profile Picture">
+<h2>Knowing the tool was never enough.</h2>
+${flow(['Excel','SQL','Power BI','Python','AI','Data engineering','Teaching','Business problems'])}
+<p class="lesson">Every new tool increased capability. Every real problem demanded something deeper: thinking.</p>
+${Q('I don\'t just teach data analytics. I teach people how to think with data.')}`,
+`[STORY] I started with Excel like many of us. Then SQL. Then Power BI, Python, AI, data engineering. Each tool made me more powerful. [PAUSE]<br><br>Then I started teaching, and solving real business problems. And I noticed: the people who struggled didn't lack tools. They lacked a way to think. That's when I stopped teaching buttons and started teaching thinking.<br><br>[Replace with your own specific moment — a client, a failed project, a student.]`],
+// 13
+['dark0',`<p class="sub">A calculator calculates. A map shows directions. A GPS suggests a route.<br>But <b>you</b> decide where you want to go.</p>
+${Q('Technology can increase your speed, but only thinking can improve your direction.').replace('class="q"','class="q big"')}
+<p class="sub">AI can generate, analyse, summarise and recommend. Humans must understand <b>why</b>.</p>`,
+`<b>[LET THE SLIDE SIT]</b> Read the quote out loud. Slowly. Then be quiet.<br><br>This is life, not just data. Tools will change — they always do. The person who keeps growing their thinking stays useful. Your tools can change. Your ability to think must grow with them.`],
+// 14
+['',`<h2>The 5 questions before the first query.</h2>
+${['What is the business problem?','What decision are we trying to make?','What data do we have?','What could make this data wrong or misleading?','What action will this insight change?'].map((x,i)=>`<div class="chk" style="cursor:default"><i style="color:var(--navy);background:var(--elec);border-color:var(--elec)">${i+1}</i>${x}</div>`).join('')}
+${Q('The hardest part of data analysis is often not finding the answer. It is asking the right question.')}`,
+`Print these. Pin them next to your monitor. [PAUSE]<br><br>Question four is my favourite. It is the one nobody asks. Ask it of every dataset, every AI answer, every pretty chart.<br><br><b>[ASK AUDIENCE]</b> Which matters more: knowing the tool or understanding the problem?`],
+// 15
+['alt',`<h2>Tomorrow morning, do this.</h2>
+${['Take one real business problem.','Write the business question before opening Power BI, Excel or SQL.','Use AI to help investigate — not to blindly decide.','Validate every important output.','Turn the insight into an action or recommendation.'].map(x=>`<div class="chk" tabindex="0" role="checkbox" aria-checked="false"><i>✓</i>${x}</div>`).join('')}`,
+`Five steps. No new software. Click them as you say them. [PAUSE]<br><br>Do it with something real — your own job, a side project, a family business. One problem. One question. Write it before you open anything. That's the whole challenge.`],
+// 16 closing
+['dark0 stage',`<h2 class="f">The future doesn't belong to people who know the most tools.</h2>
+<h2 class="f">It belongs to people who know how to use tools…</h2>
+<h2 class="f hl">…to solve problems that matter.</h2>`,
+`<b>[CLICK]</b> Say each line. Pause fully between them. Let the room go quiet.`],
+// 17
+['dark0 stage',`<h2 class="f wide">Learn the tools.<br>Understand the data.<br>Question the answer.<br>Think deeply.<br>Solve real problems.</h2>
+<p class="sub f" style="max-width:34ch">Because in the age of AI, the greatest advantage may not be knowing more. It may be knowing what matters.</p>
+<p class="sub f">— Fatolu Peter</p>`,
+`<b>[CLICK]</b> Slowly. Then the last line. Then the central idea: AI can help you work with data faster. But your ability to think determines whether the work actually matters.`],
+// 18
+['stage',`<img class="pf" src="./Pet.png" alt="Peter's Profile Picture">
+<p class="sub" style="max-width:none">Data Analyst | Data Scientist | AI Prompt Engineer</p>
+<p class="sub" style="color:#fff">CEO/Founder — Emperor Data Hub</p>
+<p class="lesson">“Building the Future of Data Science in Nigeria”</p><div class="ct"><a href="tel:+2349064108238" target="_blank" rel="noopener" aria-label="Phone: +234 906 410 8238"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>+234 906 410 8238</a><a href="mailto:Olagokeblissman@gmail.com" target="_blank" rel="noopener" aria-label="Email: Olagokeblissman@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>Olagokeblissman@gmail.com</a><a href="https://www.linkedin.com/in/fatolu-peter-a31077306" target="_blank" rel="noopener" aria-label="LinkedIn: linkedin.com/in/fatolu-peter-a31077306"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>linkedin.com/in/fatolu-peter-a31077306</a><a href="https://github.com/Fatolu-peter" target="_blank" rel="noopener" aria-label="GitHub: github.com/Fatolu-peter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-7a5.4 5.4 0 0 0-1.5-3.8 5 5 0 0 0-.1-3.8s-1.2-.3-3.9 1.5a13.4 13.4 0 0 0-7 0C6.3 1.9 5.1 2.2 5.1 2.2a5 5 0 0 0-.1 3.8A5.4 5.4 0 0 0 3.5 9.8c0 5.4 3.3 6.6 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/></svg>github.com/Fatolu-peter</a><a href="https://fatolu-peter-website-com-u2g4.vercel.app" target="_blank" rel="noopener" aria-label="Portfolio website: fatolu-peter-website-com-u2g4.vercel.app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>fatolu-peter-website-com-u2g4.vercel.app</a></div>
+<p class="sub" style="margin-top:2vh;font-size:.9rem">People Like Us (PLU) · 3 October 2026</p>`,
+`Don't say "thank you for listening." Say: <i>"Go and solve something real."</i> [PAUSE] Then open for questions.`]
+];
+
+const deck=document.getElementById('deck'),notes=document.getElementById('notes'),ctr=document.getElementById('ctr'),bar=document.getElementById('bar');
+S.forEach(s=>{const e=document.createElement('section');e.className='slide '+s[0];e.innerHTML=s[1];deck.appendChild(e)});
+const sl=[...document.querySelectorAll('.slide')];let i=0;
+const pad=n=>String(n).padStart(2,'0');
+function count(el){const t=+el.dataset.count,s=performance.now();(function f(n){const p=Math.min((n-s)/1400,1);el.textContent=Math.round(t*p).toLocaleString();if(p<1)requestAnimationFrame(f)})(s)}
+function go(n,end){i=Math.max(0,Math.min(sl.length-1,n));sl.forEach((e,k)=>e.classList.toggle('on',k===i));
+ sl[i].querySelectorAll('.f').forEach((f,k)=>f.classList.toggle('show',!!end||k<(i===0?2:1)));
+ sl[i].querySelectorAll('[data-count]').forEach(count);sl[i].scrollTop=0;
+ ctr.textContent=pad(i+1)+' / '+pad(sl.length);bar.style.width=((i+1)/sl.length*100)+'%';
+ notes.innerHTML='<b>Speaker notes — slide '+(i+1)+'</b><br><br>'+S[i][2];location.hash=i+1}
+function next(){const h=sl[i].querySelector('.f:not(.show)');if(h)h.classList.add('show');else go(i+1)}
+function prev(){go(i-1,true)}
+document.getElementById('nx').onclick=next;document.getElementById('pv').onclick=prev;
+const tn=()=>notes.classList.toggle('open');document.getElementById('nt').onclick=tn;
+const tf=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();document.getElementById('fs').onclick=tf;
+addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();next()}else if(k==='ArrowLeft'||k==='PageUp')prev();else if(k==='n'||k==='N')tn();else if(k==='f'||k==='F')tf();else if(k==='Home')go(0);else if(k==='End')go(sl.length-1,true)});
+deck.addEventListener('click',e=>{
+ const t=e.target.closest('[data-tip]');if(t){const sc=t.closest('.slide');sc.querySelectorAll('[data-tip]').forEach(x=>x.classList.remove('sel'));t.classList.add('sel');sc.querySelector('.tipbox').textContent=t.dataset.tip;return}
+ const c=e.target.closest('.chk[role]');if(c){c.classList.toggle('done');c.setAttribute('aria-checked',c.classList.contains('done'))}});
+deck.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.chk[role]'))e.target.click()});
+let x0;addEventListener('touchstart',e=>x0=e.touches[0].clientX);addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>60)d<0?next():prev()});
+// fragments start hidden except slide-1 first item
+sl.forEach((s,k)=>s.querySelectorAll('.f').forEach((f,j)=>{if(!(k===0&&j<2))f.classList.remove('show')}));
+go(Math.max(0,(parseInt(location.hash.slice(1))||1)-1),true);
+</script></body></html>
